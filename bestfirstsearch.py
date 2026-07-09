@@ -1,53 +1,41 @@
 from queue import PriorityQueue
 
-# Graph represented as adjacency list
-graph = {
-    'A': [('B', 4), ('C', 2)],
-    'B': [('D', 5), ('E', 12)],
-    'C': [('F', 3)],
-    'D': [],
-    'E': [],
-    'F': [],
-    
-}
-
-# Heuristic values
-heuristic = {
-    'A': 10,
-    'B': 8,
-    'C': 5,
-    'D': 6,
-    'E': 4,
-    'F': 0,
-    
-}
-
-def best_first_search(start, goal):
+def bfs(graph, start, target, heuristics):
     visited = set()
     pq = PriorityQueue()
-
-    # Add starting node
-    pq.put((heuristic[start], start))
+    pq.put((heuristics[start], start, [start]))
+    visited.add(start)
 
     while not pq.empty():
-        h, current = pq.get()
+        h, node, path = pq.get()
 
-        if current in visited:
-            continue
-
-        print(current, end=" ")
-
-        visited.add(current)
-
-        if current == goal:
-            print("\nGoal reached!")
-            return
-
-        for neighbor, cost in graph[current]:
+        if node == target:
+            return path, h
+        
+        for neighbor in graph.get(node, []):
             if neighbor not in visited:
-                pq.put((heuristic[neighbor], neighbor))
+                visited.add(neighbor)
+                pq.put((heuristics[neighbor], neighbor, path + [neighbor]))
 
-    print("\nGoal not found!")
+    return None, None
+if __name__ == "__main__":
+    graph = {
+        'A': ['B', 'C'],
+        'B': ['D', 'E'],
+        'C': ['F'],
+        'D': [],
+        'E': [],
+        'F': []
+    }
 
-# Driver code
-best_first_search('A', 'F')
+    heuristics = {
+        'A': 10, 
+        'B': 8,
+        'C': 5,
+        'D': 6,
+        'E': 4,
+        'F': 0
+    }
+
+    path, cost = bfs(graph, 'A', 'F', heuristics)
+    print(f"Path found by BFS: {path} with Target Heuristic: {cost}")
